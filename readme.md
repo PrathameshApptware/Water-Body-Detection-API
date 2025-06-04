@@ -59,7 +59,3 @@ uvicorn main:app --reload
 
 **Prathamesh Apptware Team**
 Built with ❤️ for geospatial intelligence and environmental awareness.
-
-```
-
-
