@@ -175,3 +175,4 @@ class DetectionService:
                 results.append(result)
         
         return results  
+    
