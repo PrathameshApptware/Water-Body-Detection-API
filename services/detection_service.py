@@ -62,72 +62,6 @@
 # # #             return []
     
     
-# # class DetectionService:
-# #     def __init__(self):
-# #         # Initialize Google Maps client with your API key
-# #         self.gmaps = googlemaps.Client(key=os.getenv('GOOGLE_PLACES_API_KEY'))
-# #         self.api_base_url = "https://reportallusa.com/api/parcels"
-# #         self.client_key = os.getenv("REPORT_ALL_KEY", "sGeU2WMrgB")
-# #         self.api_version = "9"
-
-# #     def get_water_bodies(self, lat: float, lon: float, radius: int = 1000):
-# #         """
-# #         Fetch water bodies within a specified radius of given latitude and longitude using Google Places API.
-
-# #         Args:
-# #             lat (float): Latitude of the center point.
-# #             lon (float): Longitude of the center point.
-# #             radius (int): Radius in meters to search for water bodies.
-
-# #         Returns:
-# #             list: A list of water bodies with their coordinates and parcel data.
-# #         """
-# #         try:
-# #             # Search for water-related places
-# #             places_result = self.gmaps.places_nearby(
-# #                 location=(lat, lon),
-# #                 radius=radius,
-# #                 keyword='water',
-# #                 type=['natural_feature']
-# #             )
-
-# #             water_bodies = []
-
-# #             # Extract locations from results
-# #             if places_result.get('results'):
-# #                 for place in places_result['results']:
-# #                     location = place['geometry']['location']
-# #                     water_bodies.append((
-# #                         location['lat'],
-# #                         location['lng']
-# #                     ))
-
-# #                 # Handle pagination if there are more results
-# #                 while 'next_page_token' in places_result:
-# #                     # Wait briefly before requesting next page (API requirement)
-# #                     time.sleep(2)
-# #                     places_result = self.gmaps.places_nearby(
-# #                         location=(lat, lon),
-# #                         radius=radius,
-# #                         keyword='water',
-# #                         type=['natural_feature'],
-# #                         page_token=places_result['next_page_token']
-# #                     )
-                    
-# #                     for place in places_result.get('results', []):
-# #                         location = place['geometry']['location']
-# #                         water_bodies.append((
-# #                             location['lat'],
-# #                             location['lng']
-# #                         ))
-
-# #             # Return the enriched data with parcel information
-# #             return self.get_parcels_for_water_bodies(water_bodies)
-
-# #         except Exception as e:
-# #             logger.error(f"Error fetching water bodies from Google Places API: {e}")
-# #             return []
-    
 # #     def fetch_parcel_data(self, lat: float, lon: float) -> Dict:
 # #         """Fetch parcel data for a single coordinate point"""
 # #         try:
@@ -177,149 +111,6 @@
         
 # #         return results  
     
-    
-# import googlemaps
-# import requests
-# import logging
-# import time
-# from typing import List, Dict, Tuple
-# from concurrent.futures import ThreadPoolExecutor
-# import os
-
-# logger = logging.getLogger(__name__)
-
-# class DetectionService:
-#     def __init__(self):
-#         # Initialize Google Maps client with your API key
-#         self.gmaps = googlemaps.Client(key=os.getenv('GOOGLE_PLACES_API_KEY'))
-#         self.api_base_url = "https://reportallusa.com/api/parcels"
-#         self.client_key = os.getenv("REPORT_ALL_KEY", "sGeU2WMrgB")
-#         self.api_version = "9"
-
-#     def get_water_bodies(self, lat: float, lon: float, radius: int = 1000):
-#         """
-#         Fetch water bodies within a specified radius of given latitude and longitude using Google Places API.
-
-#         Args:
-#             lat (float): Latitude of the center point.
-#             lon (float): Longitude of the center point.
-#             radius (int): Radius in meters to search for water bodies.
-
-#         Returns:
-#             list: A list of water bodies with their coordinates and parcel data.
-#         """
-#         try:
-#             # Search for water-related places using multiple types to increase coverage
-#             water_bodies = []
-            
-#             # Search for natural features (lakes, rivers)
-#             places_result = self.gmaps.places_nearby(
-#                 location=(lat, lon),
-#                 radius=radius,
-#                 keyword='lake pond water reservoir',
-#                 type='establishment'
-#             )
-            
-#             # Process results
-#             self._extract_locations(places_result, water_bodies)
-            
-#             # Handle pagination
-#             self._handle_pagination(places_result, water_bodies, lat, lon, radius)
-            
-#             # Also search for just "water" to get better coverage
-#             places_result = self.gmaps.places_nearby(
-#                 location=(lat, lon),
-#                 radius=radius,
-#                 keyword='lake OR pond OR river OR reservoir',
-#             )
-            
-#             # Process results
-#             self._extract_locations(places_result, water_bodies)
-            
-#             # Handle pagination
-#             self._handle_pagination(places_result, water_bodies, lat, lon, radius)
-
-#             # Return the enriched data with parcel information
-#             return self.get_parcels_for_water_bodies(water_bodies)
-
-#         except Exception as e:
-#             logger.error(f"Error fetching water bodies from Google Places API: {e}")
-#             return []
-    
-#     def _extract_locations(self, places_result, water_bodies):
-#         """Helper method to extract locations from places API results"""
-#         if places_result.get('results'):
-#             for place in places_result['results']:
-#                 location = place['geometry']['location']
-#                 water_body = (
-#                     location['lat'],
-#                     location['lng']
-#                 )
-#                 # Avoid duplicates
-#                 if water_body not in water_bodies:
-#                     water_bodies.append(water_body)
-    
-#     def _handle_pagination(self, places_result, water_bodies, lat, lon, radius):
-#         """Helper method to handle pagination in places API results"""
-#         while 'next_page_token' in places_result:
-#             # Wait briefly before requesting next page (API requirement)
-#             time.sleep(2)
-#             try:
-#                 places_result = self.gmaps.places_nearby(
-#                     page_token=places_result['next_page_token']
-#                 )
-#                 self._extract_locations(places_result, water_bodies)
-#             except Exception as e:
-#                 logger.error(f"Error handling pagination: {e}")
-#                 break
-    
-#     def fetch_parcel_data(self, lat: float, lon: float) -> Dict:
-#         """Fetch parcel data for a single coordinate point"""
-#         try:
-#             params = {
-#                 "client": self.client_key,
-#                 "v": self.api_version,
-#                 "spatial_intersect": f"POINT({lon} {lat})",
-#                 "si_srid": "4326"
-#             }
-#             response = requests.get(self.api_base_url, params=params, timeout=10)
-#             response.raise_for_status()
-            
-#             data = response.json()
-#             return data['results']
-            
-#         except Exception as e:
-#             logging.error(f"Error fetching parcel data for {lat},{lon}: {str(e)}")
-#             return {"error": str(e)}
-
-#     def get_parcels_for_water_bodies(
-#         self, 
-#         water_body_coords: List[Tuple[float, float]]
-#     ) -> List[Dict]:
-#         """
-#         Fetch parcel data for multiple water body coordinates
-        
-#         Args:
-#             water_body_coords: List of (lat, lon) tuples from DetectionService
-            
-#         Returns:
-#             List of dictionaries with water body coordinates and parcel data
-#         """
-#         results = []
-        
-#         with ThreadPoolExecutor(max_workers=5) as executor:
-#             futures = []
-#             for lat, lon in water_body_coords:
-#                 futures.append(executor.submit(self.fetch_parcel_data, lat, lon))
-            
-#             for i, future in enumerate(futures):
-#                 result = {
-#                     "water_body_coordinates": water_body_coords[i],
-#                     "parcel_data": future.result()
-#                 }
-#                 results.append(result)
-        
-#         return results
 
 
 import googlemaps
@@ -349,7 +140,8 @@ class DetectionService:
 
     def get_water_bodies(self, lat: float, lon: float, radius: int = 1000):
         """
-        Fetch water bodies within a specified radius of given latitude and longitude using Google Places API.
+        Fetch water bodies within a specified radius of given latitude and longitude.
+        This function is a drop-in replacement for the overpy-based water body detection.
 
         Args:
             lat (float): Latitude of the center point.
@@ -357,100 +149,85 @@ class DetectionService:
             radius (int): Radius in meters to search for water bodies.
 
         Returns:
-            list: A list of water bodies with their coordinates and parcel data.
+            list: A list of tuples containing latitude and longitude of water bodies.
         """
-        print(f"Searching for water bodies at: {lat}, {lon} with radius {radius}m")
         try:
-            # Search for water-related places using multiple types to increase coverage
             water_bodies = []
             
-            # Search for natural features (lakes, rivers)
-            print("Searching with keyword='lake pond water reservoir', type='establishment'")
-            places_result = self.gmaps.places_nearby(
-                location=(lat, lon),
-                radius=radius,
-                keyword='lake pond water reservoir',
-                type='establishment'
-            )
+            # Strategy 1: Use places_nearby API with water-related keywords
+            print(f"Searching for water bodies at {lat}, {lon} within {radius}m radius")
             
-            # Print API response status
-            print(f"API response status: {places_result.get('status', 'unknown')}")
-            print(f"Found {len(places_result.get('results', []))} results in first query")
+            # Search for natural features - lakes, ponds, rivers
+            keywords = ['lake', 'pond', 'reservoir', 'river', 'creek', 'water']
             
-            # Process results
-            self._extract_locations(places_result, water_bodies)
+            for keyword in keywords:
+                try:
+                    places_result = self.gmaps.places_nearby(
+                        location=(lat, lon),
+                        radius=radius,
+                        keyword=keyword,
+                        type='natural_feature'  # Focus on natural features
+                    )
+                    
+                    if places_result.get('status') == 'OK':
+                        # Extract coordinates from results
+                        for place in places_result.get('results', []):
+                            if 'geometry' in place and 'location' in place['geometry']:
+                                location = place['geometry']['location']
+                                water_body = (float(location['lat']), float(location['lng']))
+                                
+                                # Avoid duplicates
+                                if water_body not in water_bodies:
+                                    water_bodies.append(water_body)
+                                    print(f"Found water body '{place.get('name')}' at {water_body}")
+                        
+                        # Handle pagination similar to how Overpy handles multiple results
+                        if 'next_page_token' in places_result:
+                            time.sleep(2)  # Required delay before requesting next page
+                            next_page = self.gmaps.places_nearby(
+                                page_token=places_result['next_page_token']
+                            )
+                            
+                            for place in next_page.get('results', []):
+                                if 'geometry' in place and 'location' in place['geometry']:
+                                    location = place['geometry']['location']
+                                    water_body = (float(location['lat']), float(location['lng']))
+                                    if water_body not in water_bodies:
+                                        water_bodies.append(water_body)
+                                        print(f"Found water body '{place.get('name')}' at {water_body}")
+                
+                except Exception as keyword_error:
+                    print(f"Error searching for keyword '{keyword}': {keyword_error}")
             
-            # Handle pagination
-            self._handle_pagination(places_result, water_bodies, lat, lon, radius)
+            # Strategy 2: Use text search as a backup method
+            try:
+                for keyword in ['lake', 'pond']:
+                    places_result = self.gmaps.places(
+                        query=keyword,
+                        location=(lat, lon),
+                        radius=radius
+                    )
+                    
+                    for place in places_result.get('results', []):
+                        if 'geometry' in place and 'location' in place['geometry']:
+                            location = place['geometry']['location']
+                            water_body = (float(location['lat']), float(location['lng']))
+                            if water_body not in water_bodies:
+                                water_bodies.append(water_body)
+                                print(f"Found water body '{place.get('name')}' from text search at {water_body}")
             
-            # Also search for just "water" to get better coverage
-            print("Searching with keyword='lake OR pond OR river OR reservoir'")
-            places_result = self.gmaps.places_nearby(
-                location=(lat, lon),
-                radius=radius,
-                keyword='lake OR pond OR river OR reservoir',
-            )
+            except Exception as text_search_error:
+                print(f"Error in text search: {text_search_error}")
             
-            print(f"API response status: {places_result.get('status', 'unknown')}")
-            print(f"Found {len(places_result.get('results', []))} results in second query")
+            print(f"Total water bodies found: {len(water_bodies)}")
             
-            # Process results
-            self._extract_locations(places_result, water_bodies)
-            
-            # Handle pagination
-            self._handle_pagination(places_result, water_bodies, lat, lon, radius)
-            
-            # Also try text search which sometimes works better
-            print("Trying text search for 'lake'")
-            places_result = self.gmaps.places(
-                query='lake',
-                location=(lat, lon),
-                radius=radius
-            )
-            
-            print(f"Text search found {len(places_result.get('results', []))} results")
-            self._extract_locations(places_result, water_bodies)
-
-            print(f"Total unique water bodies found: {len(water_bodies)}")
-
-            # Return the enriched data with parcel information
+            # Return the enriched data with parcel information, same as the original function
             return self.get_parcels_for_water_bodies(water_bodies)
 
         except Exception as e:
-            logger.error(f"Error fetching water bodies from Google Places API: {e}")
-            print(f"Error: {e}")
+            logger.error(f"Error fetching water bodies: {e}")
             return []
-    
-    def _extract_locations(self, places_result, water_bodies):
-        """Helper method to extract locations from places API results"""
-        if places_result.get('results'):
-            for place in places_result['results']:
-                location = place['geometry']['location']
-                water_body = (
-                    location['lat'],
-                    location['lng']
-                )
-                # Avoid duplicates
-                if water_body not in water_bodies:
-                    water_bodies.append(water_body)
-                    print(f"Found water body at: {water_body[0]}, {water_body[1]} - {place.get('name', 'Unknown')}")
-    
-    def _handle_pagination(self, places_result, water_bodies, lat, lon, radius):
-        """Helper method to handle pagination in places API results"""
-        while 'next_page_token' in places_result:
-            # Wait briefly before requesting next page (API requirement)
-            time.sleep(2)
-            try:
-                places_result = self.gmaps.places_nearby(
-                    page_token=places_result['next_page_token']
-                )
-                print(f"Pagination returned {len(places_result.get('results', []))} additional results")
-                self._extract_locations(places_result, water_bodies)
-            except Exception as e:
-                logger.error(f"Error handling pagination: {e}")
-                print(f"Pagination error: {e}")
-                break
-    
+
     def fetch_parcel_data(self, lat: float, lon: float) -> Dict:
         """Fetch parcel data for a single coordinate point"""
         try:
@@ -485,6 +262,12 @@ class DetectionService:
         """
         results = []
         
+        if not water_body_coords:
+            print("No water body coordinates to fetch parcels for")
+            return results
+            
+        print(f"Fetching parcel data for {len(water_body_coords)} water bodies")
+        
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = []
             for lat, lon in water_body_coords:
@@ -496,73 +279,13 @@ class DetectionService:
                     "parcel_data": future.result()
                 }
                 results.append(result)
+                
+                # Print summary of parcel data for debugging
+                parcel_data = result.get("parcel_data", [])
+                if isinstance(parcel_data, list) and parcel_data:
+                    parcel = parcel_data[0]
+                    address = parcel.get('address', 'No address')
+                    print(f"Found parcel at {address} for water body at {water_body_coords[i]}")
         
         return results
-        
-    def find_water_bodies(self, locations=None):
-        """
-        Standalone method to search for water bodies in specified locations
-        and print their coordinates
-        
-        Args:
-            locations: Optional list of dictionaries with name, lat, lon keys.
-                      If None, uses default test locations.
-        """
-        # Default test locations if none provided
-        if locations is None:
-            locations = [
-                {"name": "Lake Michigan area", "lat": 41.8781, "lon": -87.6298},  # Chicago
-                {"name": "Florida Everglades", "lat": 25.2866, "lon": -80.8987},
-                {"name": "Central Park NYC", "lat": 40.7812, "lon": -73.9665}
-            ]
-        
-        # Search radius in meters
-        radius = 1000  # 5km radius
-        
-        print("==== Water Bodies Finder ====")
-        
-        for location in locations:
-            print(f"\nSearching for water bodies near {location['name']}...")
-            print(f"Coordinates: {location['lat']}, {location['lon']}")
-            print(f"Search radius: {radius} meters")
-            
-            # Get water bodies
-            start_time = time.time()
-            water_bodies = self.get_water_bodies(
-                lat=location['lat'], 
-                lon=location['lon'], 
-                radius=radius
-            )
-            elapsed_time = time.time() - start_time
-            
-            # Print results
-            print(f"Found {len(water_bodies)} water bodies in {elapsed_time:.2f} seconds:")
-            
-            if water_bodies:
-                for i, water_body in enumerate(water_bodies, 1):
-                    coords = water_body.get('water_body_coordinates', ('N/A', 'N/A'))
-                    print(f"  {i}. Water body at: {coords[0]}, {coords[1]}")
-                    
-                    # Print first parcel info if available
-                    parcel_data = water_body.get('parcel_data', [])
-                    if parcel_data and isinstance(parcel_data, list) and len(parcel_data) > 0:
-                        parcel = parcel_data[0]
-                        print(f"     Parcel info: {parcel.get('address', 'No address')} - {parcel.get('owner_name', 'Unknown owner')}")
-            else:
-                print("  No water bodies found in this area.")
-            
-            print("-" * 50)
-            
-        return "Water body search complete"
 
-
-# Simple test function to run when file is executed directly
-if __name__ == "__main__":
-    service = DetectionService()
-    
-    # Test with custom location - adjust these coordinates as needed
-    custom_location = [
-        {"name": "Your Location", "lat": 34.0522, "lon": -118.2437}  # Los Angeles - change to your coordinates
-    ]
-    
-    service.find_water_bodies(custom_location)
